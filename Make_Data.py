@@ -242,6 +242,8 @@ class Make_Data_2020:
         AP_Final = pd.merge(AP_Final, AP_Math, on='Key', how='outer')
         AP_Final = pd.merge(AP_Final, AP_Phys, on='Key', how='outer')
         AP_Final.fillna(0,inplace=True)
+        print('ap')
+        print(AP_Final['AP Math Level'].isna().sum())
 
         return AP_Final
 
@@ -448,6 +450,9 @@ class Make_Data_2021:
 
         AP_Final = AP_Final[['PUID_SIX','AP Math','AP Math Score','AP Phys','AP Phys Score']]
 
+        print('ap 2021')
+        print(AP_Final['AP Phys Score'].isna().sum())
+
         return AP_Final
 
     def HS(self):
@@ -492,8 +497,9 @@ class Make_Data_2021:
         d2021_cols = ('PUID_SIX', 'GENDER_DESC', 'REPORTING_ETHNICITY','UNDERREPRESENTED_MINORITY_IND', 'ADMISSIONS_ATTRIBUTE_DESC',
                'ACADEMIC_PERIOD', 'ACADEMIC_PERIOD_DESC', 'COURSE_IDENTIFICATION','FINAL_GRADE','REPEAT_COURSE_IND')
 
-        return self.data['Demographics_Courses'].loc[:,d2021_cols]
+        data = self.data['Demographics_Courses'].loc[:,d2021_cols]
 
+        return data
     def stud_curr(self):
         stCur = self.data['Student_Curricula']
 
@@ -561,9 +567,13 @@ class combine:
 
         return df
 
+d1 = Make_Data_2020().constructor()
+d2 = Make_Data_2021().constructor()
 
+Data = combine(d1,d2).standard()
+Data.reset_index(inplace=True,drop=True)
 
-
+print(Data[Data['college'].map(type)==float]['academicPeriodDesc'].value_counts())
 
 
 
