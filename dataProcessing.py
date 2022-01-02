@@ -55,10 +55,14 @@ class Data_Processing:
     """
 
     # Load data
-    def __init__(self,data,size):
+    def __init__(self,data,size,val):
         self.data = data
         self.data.dropna(subset=['finalGrade'],inplace=True)
-        self.train, self.test = train_test_split(self.data,test_size=size,random_state=42)
+        if val == 'split':
+            self.train = self.data[self.data['academicPeriodDesc'] != 'Spring 2021']
+            self.test = self.data[self.data['academicPeriodDesc'] == 'Spring 2021'] 
+        else:
+            self.train,self.test = train_test_split(self.data,test_size=size)
         self.train.drop_duplicates(subset=['Key'],keep='first',inplace=True)
         self.test.drop_duplicates(subset=['Key'],keep='first',inplace=True)
         self.trainLab,self.testLab = None,None
@@ -235,7 +239,7 @@ class Data_Processing:
 
     def APactSat(self):
         vals = {'ACT/SAT Math (avg)':stats.mode(self.train['ACT/SAT Math (avg)'])[0][0],'ACT/SAT Non-Math (avg)':stats.mode(self.train['ACT/SAT Non-Math (avg)'])[0][0],'AP Math':stats.mode(self.train['AP Math'])[0][0],
-                'AP Math Score':stats.mode(self.train['AP Math Score'])[0][0],'AP Phys':stats.mode(self.train['AP Phys'])[0][0],'AP Phys Score':stats.mode(self.train['AP Phys Score'])[0][0]}
+                'AP Math Score':0,'AP Phys':stats.mode(self.train['AP Phys'])[0][0],'AP Phys Score':0}
         self.train.fillna(value=vals,inplace=True)
         self.test.fillna(value=vals,inplace=True)
 
@@ -245,9 +249,6 @@ class Data_Processing:
         grades1 = ['A+','A','A-','B+','B','B-','P']
         self.trainLab = self.train['finalGrade'].map(lambda x: 1 if x in grades1 else 0)
         self.testLab = self.test['finalGrade'].map(lambda x: 1 if x in grades1 else 0)
-
-        self.train.drop(['finalGrade'],axis=1,inplace=True)
-        self.test.drop(['finalGrade'],axis=1,inplace=True)
 
     def output(self):
         self.APactSat()
@@ -260,7 +261,7 @@ class Data_Processing:
         return self.train,self.test,self.trainLab,self.testLab
 
 
-x = Data_Processing(Data_220,0.2)
+x = Data_Processing(Data_220,0.2,'split')
 train,test,trainLab,testLab = x.output()
 
 
